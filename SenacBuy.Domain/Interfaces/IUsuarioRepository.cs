@@ -15,5 +15,5 @@ public  interface IUsuarioRepository
 
     Task AtualizarAsync(Usuario usuario);//método para atualizar um usuário existente, recebendo um objeto do tipo Usuario e retornando a tarefa assíncrona
 
-    Task RemoverAsync(Usuario usuario); 
+    Task RemoverAsync(int id); 
 }
