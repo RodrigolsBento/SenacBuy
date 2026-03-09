@@ -14,4 +14,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SenacBuy.Domain\SenacBuy.Domain.csproj" />
+  </ItemGroup>
+
 </Project>
