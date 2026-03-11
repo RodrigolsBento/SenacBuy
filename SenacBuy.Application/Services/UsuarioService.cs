@@ -21,7 +21,7 @@ public class UsuarioService
         _usuarioRepository = usuarioRepository;
     }
 
-    //MET. ASÍNCRONO task é o tipo     passar o parâmetro
+    //MET. ASÍNCRONO task é o tipo     passar o parâmetro // validação/ autenticação de login de usuário
     public async Task<LoginResponseDto> AutenticarAsync(LoginDto loginDto)
     {
         var usuario = await _usuarioRepository.ObterPorEmailAsync(loginDto.Email);
@@ -32,11 +32,29 @@ public class UsuarioService
                 Sucesso = false,
                 Mensagem = "E-mail não encontrado"
             };
-            
+
         }
 
         //entra no banco criptograda e será verificado criptografada 
-        var senHashFornecida = GerarHash(loginDto.Senha);
+        var senhaHashFornecida = GerarHash(loginDto.Senha);
+        if (usuario.SenhaHash != senhaHashFornecida)
+        {
+            return new LoginResponseDto
+            {
+                Sucesso = false,
+                Mensagem = "E-mail não encontrado"
+            };
+        }
+
+        //após as duas respostas de erro, se chegar aqui é porque o login foi bem-sucedido, então retorna os dados do usuário e a mensagem de sucesso
+        return new LoginResponseDto
+        {
+            Id = usuario.Id,
+            Nome = usuario.Nome,
+            Email = usuario.Email,
+            Sucesso = true,
+            Mensagem = "Autenticação bem-sucedida"
+        };
 
     }
 
