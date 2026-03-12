@@ -8,6 +8,8 @@ public class UsuarioDto
 
     public string Email { get; set; } = string.Empty;
 
+    public string? FotoPerfil { get; set; } 
+
 }
 
 //criar usuario
@@ -16,6 +18,7 @@ public class CriarUsuarioDto
     public string Nome { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
     public string Senha { get; set; } = string.Empty;
+    public string? FotoPerfil { get; set; }
 }
 public class LoginDto
 {
@@ -31,4 +34,6 @@ public class LoginResponseDto
     public bool Sucesso { get; set; }
 
     public string Mensagem { get; set; } = string.Empty;
+
+    public string? FotoPerfil { get; set; }
 }
