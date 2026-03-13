@@ -1,27 +1,23 @@
-﻿namespace SenacBuy.Application.DTOs;
+namespace SenacBuy.Application.DTOs;
 
-public  class PedidoDto
+/// <summary>DTOs de Pedido para comunicação entre camadas</summary>
+
+public class PedidoDto
 {
-
     public int Id { get; set; }
-
     public int ClienteId { get; set; }
-    public string NomeCliente { get; set; } = string.Empty;//campo personalizando, não necessáriamente espelhando no banco 
-    
+    public string NomeCliente { get; set; } = string.Empty;
     public DateTime DataPedido { get; set; }
-
-    public decimal  Total { get; set; }
-
-    public List <ItemPedidoDto> Itens { get; set; } = new();
-
-
+    public decimal           Total       { get; set; }
+    public string            Status      { get; set; } = "Pendente";
+    public List<ItemPedidoDto> Itens     { get; set; } = new();
 }
 
 public class ItemPedidoDto
 {
     public int Id { get; set; }
     public int ProdutoId { get; set; }
-    public string NomeProduto { get; set; } = string.Empty;//campo personalizando, não necessáriamente espelhando no banco 
+    public string NomeProduto { get; set; } = string.Empty;
     public int Quantidade { get; set; }
     public decimal PrecoUnitario { get; set; }
     public decimal Subtotal => Quantidade * PrecoUnitario;
@@ -37,6 +33,11 @@ public class CriarItemPedidoDto
 {
     public int ProdutoId { get; set; }
     public int Quantidade { get; set; }
-    
 }
 
+public class AtualizarPedidoDto
+{
+    public int                      ClienteId { get; set; }
+    public string                   Status    { get; set; } = "Pendente";
+    public List<CriarItemPedidoDto> Itens     { get; set; } = new();
+}

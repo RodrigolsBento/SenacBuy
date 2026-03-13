@@ -33,6 +33,7 @@ public class SenacBuyDbContext : DbContext
     public DbSet<Produto> Produtos { get; set; }
     public DbSet<Pedido> Pedidos { get; set; }
     public DbSet<ItemPedido> ItensPedido { get; set; }
+    public DbSet<Categoria> Categorias { get; set; }
 
     /// <summary>
     /// Configuração do modelo de dados - relacionamentos, restrições, índices.
@@ -65,6 +66,13 @@ public class SenacBuyDbContext : DbContext
             entity.HasIndex(c => c.CPF).IsUnique();
         });
 
+        // ========== CONFIGURAÇÃO DE CATEGORIA ==========
+        modelBuilder.Entity<Categoria>(entity =>
+        {
+            entity.HasKey(c => c.Id);
+            entity.Property(c => c.Nome).IsRequired().HasMaxLength(100);
+        });
+
         // ========== CONFIGURAÇÃO DE PRODUTO ==========
         modelBuilder.Entity<Produto>(entity =>
         {
@@ -72,6 +80,12 @@ public class SenacBuyDbContext : DbContext
             entity.Property(p => p.Nome).IsRequired().HasMaxLength(100);
             // decimal(18,2) significa até 18 dígitos no total e 2 casas decimais
             entity.Property(p => p.Preco).HasColumnType("decimal(18,2)");
+
+            // Relacionamento: N Produtos → 1 Categoria (opcional)
+            entity.HasOne(p => p.Categoria)
+                  .WithMany(c => c.Produtos)
+                  .HasForeignKey(p => p.CategoriaId)
+                  .OnDelete(DeleteBehavior.SetNull);
         });
 
         // ========== CONFIGURAÇÃO DE PEDIDO ==========

@@ -1,32 +1,34 @@
-﻿namespace SenacBuy.Domain.Entities
+namespace SenacBuy.Domain.Entities;
+
+/// <summary>
+/// Entidade que representa um item dentro de um pedido.
+/// Cada item associa um produto a um pedido, com quantidade e preço no momento da venda.
+/// </summary>
+public class ItemPedido
 {
-    public class ItemPedido
-    {
+    public int Id { get; set; }
 
-        public int Id { get; set; }
+    /// <summary>Chave estrangeira para o pedido</summary>
+    public int PedidoId { get; set; }
 
-        public int PedidoId { get; set; } //chave estrangeira para o pedido
+    /// <summary>Chave estrangeira para o produto</summary>
+    public int ProdutoId { get; set; }
 
-        public int ProdutoId { get; set; }//chave estrangeira para o produto
+    /// <summary>Quantidade deste produto no pedido</summary>
+    public int Quantidade { get; set; }
 
-        public int Quantidade { get; set; } //quanto o usuário comprou
-        public decimal PrecoUnitario { get; set; } 
+    /// <summary>
+    /// Preço do produto no momento da venda.
+    /// Importante: armazenamos o preço atual pois o preço do produto pode mudar no futuro.
+    /// </summary>
+    public decimal PrecoUnitario { get; set; }
 
-        //propriedades de navegação, referência entre entidades, possui o tipo da classe 
+    // Propriedades de navegação (EF Core)
+    public Pedido? Pedido { get; set; }
+    public Produto? Produto { get; set; }
 
-        public Pedido? Pedido { get; set; }
-
-        public Produto? Produto { get; set; }
-
-        //calculo dentro de uma classe - não é boa e nem má pratica - á tipico
-        public decimal Subtotal => Quantidade * PrecoUnitario; //langda função com flecha 
-
-
-
-
-
-
-
-
-    }
+    /// <summary>
+    /// Calcula o subtotal deste item (Quantidade * PrecoUnitario)
+    /// </summary>
+    public decimal Subtotal => Quantidade * PrecoUnitario;
 }

@@ -1,163 +1,139 @@
-﻿
+using System.Security.Cryptography;
+using System.Text;
 using SenacBuy.Application.DTOs;
 using SenacBuy.Domain.Entities;
 using SenacBuy.Domain.Interfaces;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace SenacBuy.Application.Services;
 
+/// <summary>
+/// Service responsável pela lógica de negócio relacionada a usuários.
+/// Inclui criação de conta, autenticação (login) e gerenciamento.
+/// 
+/// ATENÇÃO DIDÁTICA: Este service recebe e retorna DTOs - nunca entidades diretamente.
+/// A conversão entre DTO e entidade acontece aqui, protegendo a camada de domain
+/// de ser exposta diretamente para fora.
+/// </summary>
 public class UsuarioService
 {
+    private readonly IUsuarioRepository _usuarioRepository;
 
-    //regras de negócio para o usuário
-
-
-    //injetar
-    private readonly IUsuarioRepository _usuarioRepository;//objeto da interface 
-
-    //contrutor, não tem retorno e é identica a classe 
     public UsuarioService(IUsuarioRepository usuarioRepository)
     {
         _usuarioRepository = usuarioRepository;
     }
 
-    //MET. ASÍNCRONO task é o tipo     passar o parâmetro // validação/ autenticação de login de usuário
+    /// <summary>
+    /// Autentica um usuário verificando email e senha (hash).
+    /// Fluxo: compara o hash da senha digitada com o hash armazenado.
+    /// </summary>
     public async Task<LoginResponseDto> AutenticarAsync(LoginDto loginDto)
     {
+        // 1. Busca o usuário pelo email
         var usuario = await _usuarioRepository.ObterPorEmailAsync(loginDto.Email);
+
         if (usuario == null)
         {
             return new LoginResponseDto
             {
                 Sucesso = false,
-                Mensagem = "E-mail não encontrado"
+                Mensagem = "Email não encontrado."
             };
-
         }
 
-        //entra no banco criptograda e será verificado criptografada 
+        // 2. Gera o hash da senha fornecida e compara com o hash armazenado
         var senhaHashFornecida = GerarHash(loginDto.Senha);
         if (usuario.SenhaHash != senhaHashFornecida)
         {
             return new LoginResponseDto
             {
                 Sucesso = false,
-                Mensagem = "E-mail não encontrado"
+                Mensagem = "Senha incorreta."
             };
         }
 
-        //após as duas respostas de erro, se chegar aqui é porque o login foi bem-sucedido, então retorna os dados do usuário e a mensagem de sucesso
         return new LoginResponseDto
         {
             Id = usuario.Id,
             Nome = usuario.Nome,
             Email = usuario.Email,
             Sucesso = true,
-            Mensagem = "Autenticação bem-sucedida"
+            Mensagem = "Login realizado com sucesso.",
+            FotoPerfil = usuario.FotoPerfil
         };
-
     }
 
-
-    //método para criar um novo usuário, onde o parâmetro é um objeto do tipo CriarUsuarioDto,
-    //que contém as informações necessárias para criar um novo usuário, como nome, email, senha e foto de perfil.
-    //O método é assíncrono e retorna um objeto do tipo UsuarioDto, que representa os dados do usuário criado.
-    public async Task <UsuarioDto> CriarAsync(CriarUsuarioDto dto )
+    /// <summary>Cria um novo usuário, validando unicidade do email</summary>
+    public async Task<UsuarioDto> CriarAsync(CriarUsuarioDto dto)
     {
-        //verificar se o email já existe
+        // Regra de negócio: email deve ser único
         var existente = await _usuarioRepository.ObterPorEmailAsync(dto.Email);
         if (existente != null)
-        {
-            throw new InvalidOperationException($"Já existe usuário com e-mail '{dto.Email}' . ");
-        }
+            throw new InvalidOperationException($"Já existe um usuário com o email '{dto.Email}'.");
 
-        //quando a confirmação for feita, cria-se um novo objeto do tipo usuário, onde o nome, email e foto de perfil são passados diretamente do dto, mas a senha é processada por um método de geração de hash para garantir que a senha seja armazenada de forma segura no banco de dados. O hash é uma representação criptografada da senha original, o que aumenta a segurança dos dados do usuário.
         var usuario = new Usuario
         {
             Nome = dto.Nome,
             Email = dto.Email,
-            SenhaHash = GerarHash(dto.Senha), 
+            SenhaHash = GerarHash(dto.Senha), // Converte para hash antes de salvar
             FotoPerfil = dto.FotoPerfil
         };
 
-        //metodo para criar o usuário no banco de dados, onde o objeto do tipo usuário é passado como parâmetro. O método CriarAsync é responsável por persistir os dados do usuário no banco de dados, garantindo que as informações sejam armazenadas de forma segura e eficiente.
-
         await _usuarioRepository.AdicionarAsync(usuario);
 
-        //retorno para retira o erro 
-
-        return new UsuarioDto // foi no banco inseriu e está trasendo agora do banco de dados 
-        {
-            Id = usuario.Id,//verificação por conta do aidentiti
-            Nome = usuario.Nome,
-            Email = usuario.Email,
-            FotoPerfil = usuario.FotoPerfil
-        };
-
+        return new UsuarioDto { Id = usuario.Id, Nome = usuario.Nome, Email = usuario.Email, FotoPerfil = usuario.FotoPerfil };
     }
 
-
-   
-    //listar todos os usuários
-    public async Task<IEnumerable<UsuarioDto>> ListarTodosAsync ()
+    public async Task<IEnumerable<UsuarioDto>> ListarTodosAsync()
     {
-
         var usuarios = await _usuarioRepository.ListarTodosAsync();
-        return usuarios.Select(usuario => new UsuarioDto
+        return usuarios.Select(u => new UsuarioDto
         {
-            Id = usuario.Id,
-            Nome = usuario.Nome,
-            Email = usuario.Email,
-            FotoPerfil = usuario.FotoPerfil
-
-        }); //na interface do dto está personalizado 
-
+            Id = u.Id,
+            Nome = u.Nome,
+            Email = u.Email,
+            FotoPerfil = u.FotoPerfil
+        });
     }
 
-
-    //Obter por ID
     public async Task<UsuarioDto?> ObterPorIdAsync(int id)
     {
-
-        var usuario = await _usuarioRepository.ObterPorIdAsync(id);
-
-        if (usuario == null) return null;
+        var u = await _usuarioRepository.ObterPorIdAsync(id);
+        if (u == null) return null;
 
         return new UsuarioDto
         {
-            Id = usuario.Id,
-            Nome = usuario.Nome,
-            Email = usuario.Email,
-            FotoPerfil = usuario.FotoPerfil
-
-        }; //na interface do dto está personalizado 
-
+            Id = u.Id,
+            Nome = u.Nome,
+            Email = u.Email,
+            FotoPerfil = u.FotoPerfil
+        };
     }
-   
-    
+
     public async Task RemoverAsync(int id)
     {
-
         var usuario = await _usuarioRepository.ObterPorIdAsync(id);
         if (usuario == null)
-        
-            throw new InvalidOperationException($"Usuário com ID '{id}' não encontrado.");
-        
-        await _usuarioRepository.RemoverAsync(id);
+            throw new KeyNotFoundException($"Usuário com Id {id} não encontrado.");
 
+        await _usuarioRepository.RemoverAsync(id);
     }
 
-
-    public async Task <UsuarioDto?> UpdateAsync(UsuarioDto dto)
+    /// <summary>
+    /// Atualiza Nome e Email de um usuário existente.
+    /// SenhaHash nunca é alterada por este método — troca de senha requer fluxo próprio.
+    /// Retorna null se o usuário não for encontrado.
+    /// </summary>
+    public async Task<UsuarioDto?> UpdateAsync(UsuarioDto dto)
     {
-        //1 - passo :buscar id do usuário 
+        // 1. Busca o usuário pelo Id informado no DTO
         var usuario = await _usuarioRepository.ObterPorIdAsync(dto.Id);
 
-        //2 - passo se o usuário é nulo ou não
+        // 2. Retorna null → Controller responderá 404 NotFound
         if (usuario == null)
             return null;
-        //3 - passo : atualizar os dados do usuário com as informações fornecidas no dto
+
+        // 3. Aplica as alterações permitidas (SenhaHash permanece intocada)
         usuario.Nome = dto.Nome;
         usuario.Email = dto.Email;
         if (dto.FotoPerfil != null)
@@ -165,10 +141,10 @@ public class UsuarioService
             usuario.FotoPerfil = dto.FotoPerfil;
         }
 
-        //4 - passo : salvar as alterações no banco, persistir no banco 
+        // 4. Persiste no banco via repositório
         await _usuarioRepository.AtualizarAsync(usuario);
 
-        //5 - passo : retornar um novo objeto do tipo UsuarioDto com os dados atualizados do usuário
+        // 5. Retorna o DTO atualizado
         return new UsuarioDto
         {
             Id = usuario.Id,
@@ -176,19 +152,16 @@ public class UsuarioService
             Email = usuario.Email,
             FotoPerfil = usuario.FotoPerfil
         };
-
-
     }
 
-
-
-
+    /// <summary>
+    /// Gera hash SHA256 da senha.
+    /// ATENÇÃO DIDÁTICA: Para produção real, use BCrypt ou Argon2.
+    /// SHA256 é usado aqui por simplicidade educacional.
+    /// </summary>
     private static string GerarHash(string texto)
     {
-        var byts = SHA256.HashData(Encoding.UTF8.GetBytes(texto));//habilitar o using System.Text; para Encoding funcionar
-        return Convert.ToHexString(byts).ToLower();//aqui é o hash gerado que será normalizado e não a senha 
+        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(texto));
+        return Convert.ToHexString(bytes).ToLower();
     }
-
-
-
 }
