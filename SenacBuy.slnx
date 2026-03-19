@@ -3,4 +3,5 @@
   <Project Path="SenacBuy.Application/SenacBuy.Application.csproj" />
   <Project Path="SenacBuy.Domain/SenacBuy.Domain.csproj" />
   <Project Path="SenacBuy.Infrastructure/SenacBuy.Infrastructure.csproj" Id="e970b03a-f2d0-43eb-a1f8-4393210bd2b2" />
+  <Project Path="SenacBuy.UI/SenacBuy.UI.csproj" Id="489283f7-3279-4f8d-be69-85a048057c71" />
 </Solution>

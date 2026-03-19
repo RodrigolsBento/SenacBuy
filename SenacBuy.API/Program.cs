@@ -1,5 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi;
+using SenacBuy.Application.Services;
+using SenacBuy.Domain.Interfaces;
 using SenacBuy.Infrastructure.Data;
+using SenacBuy.Infrastructure.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +13,17 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<SenacBuyDbContext>(options => 
 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));//de acordo com o tipo de banco usado
 
+//Registo dos repositórios (infrastructure implementa domain)
+builder.Services.AddScoped<IUsuarioRepository,UsuarioRepository>();//scopo da inicialização da aplicação (program)
+builder.Services.AddScoped<IClienteRepository,ClienteRepository>();//scopo da inicialização da aplicação (program)
+builder.Services.AddScoped<IProdutoRepository,ProdutoRepository>();//scopo da inicialização da aplicação (program)
+builder.Services.AddScoped<IPedidoRepository,PedidoRepository>();//scopo da inicialização da aplicação (program)
+
+//registro dos serviços 
+builder.Services.AddScoped<UsuarioService>();
+builder.Services.AddScoped<ClienteService>();
+builder.Services.AddScoped<ProdutoService>();
+builder.Services.AddScoped<PedidoService>();
 
 
 //Passo 1: Configuração de CORS (Cross-Origin Resource Sharing)
@@ -43,6 +58,13 @@ builder.Services.AddSwaggerGen(c =>
 
 
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<SenacBuyDbContext>();
+    await DatabaseSeeder.SeedAsync(db);
+}
+
 
 //Passo 3: Habilitar CORS no pipeline de requisições
 app.UseCors("PermitirTudo");
