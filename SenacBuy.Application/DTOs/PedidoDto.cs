@@ -7,7 +7,7 @@ public class PedidoDto
     public int Id { get; set; }
     public int ClienteId { get; set; }
     public string NomeCliente { get; set; } = string.Empty;
-    public DateTime DataPedido { get; set; }
+    public DateTime DataPedido { get; set; } = DateTime.Now;
     public decimal           Total       { get; set; }
     public string            Status      { get; set; } = "Pendente";
     public List<ItemPedidoDto> Itens     { get; set; } = new();
