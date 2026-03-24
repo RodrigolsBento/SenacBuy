@@ -137,7 +137,7 @@
             btnEntrar.Size = new Size(180, 51);
             btnEntrar.TabIndex = 3;
             btnEntrar.Text = "Entrar";
-            btnEntrar.Click += btnEntrar_Click;
+          
             // 
             // guna2BorderlessForm1
             // 
