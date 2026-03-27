@@ -14,7 +14,7 @@ public partial class frmLogin : Form
         InitializeComponent();
     }
 
-    private async Task btnEntrar_Click(object sender, EventArgs e)
+    private async void btnEntrar_Click(object sender, EventArgs e)
     {
         if (string.IsNullOrWhiteSpace(txtEmail.Text)|| string.IsNullOrWhiteSpace(txtSenha.Text))
         {
