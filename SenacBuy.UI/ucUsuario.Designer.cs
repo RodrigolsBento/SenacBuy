@@ -85,7 +85,6 @@
             txtPesquisa.ShadowDecoration.CustomizableEdges = customizableEdges2;
             txtPesquisa.Size = new Size(270, 35);
             txtPesquisa.TabIndex = 3;
-           
             // 
             // guna2HtmlLabel2
             // 
@@ -117,7 +116,7 @@
             btnExcluirUsuario.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
             btnExcluirUsuario.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
             btnExcluirUsuario.FillColor = Color.Red;
-            btnExcluirUsuario.Font = new Font("Segoe UI", 9F);
+            btnExcluirUsuario.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             btnExcluirUsuario.ForeColor = Color.White;
             btnExcluirUsuario.Location = new Point(765, 24);
             btnExcluirUsuario.Name = "btnExcluirUsuario";
@@ -135,7 +134,7 @@
             btnEditarUsuario.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
             btnEditarUsuario.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
             btnEditarUsuario.FillColor = Color.Goldenrod;
-            btnEditarUsuario.Font = new Font("Segoe UI", 9F);
+            btnEditarUsuario.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             btnEditarUsuario.ForeColor = Color.White;
             btnEditarUsuario.Location = new Point(652, 24);
             btnEditarUsuario.Name = "btnEditarUsuario";
@@ -154,7 +153,7 @@
             btnNovoUsuario.DisabledState.FillColor = Color.FromArgb(169, 169, 169);
             btnNovoUsuario.DisabledState.ForeColor = Color.FromArgb(141, 141, 141);
             btnNovoUsuario.FillColor = Color.Blue;
-            btnNovoUsuario.Font = new Font("Segoe UI", 9F);
+            btnNovoUsuario.Font = new Font("Segoe UI", 9F, FontStyle.Bold);
             btnNovoUsuario.ForeColor = Color.White;
             btnNovoUsuario.Location = new Point(539, 24);
             btnNovoUsuario.Name = "btnNovoUsuario";
