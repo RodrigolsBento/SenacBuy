@@ -4,6 +4,8 @@ using SenacBuy.Application.Services;
 
 namespace SenacBuy.API.Controllers;
 
+[ApiController]
+[Route("api/[controller]")]//rota para acessar o controller, api/usuario
 public class UsuarioController : ControllerBase
 {
 
