@@ -14,7 +14,7 @@ public partial class frmLogin : Form
         InitializeComponent();
     }
 
- 
+
 
     private async void btnEntrar_Click_1(object sender, EventArgs e)
     {
@@ -56,5 +56,11 @@ public partial class frmLogin : Form
             btnEntrar.Text = "Entrar";
         }
 
+    }
+
+    private void lklCadastrar_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+    {
+        frmCadastroUsuario form = new();//chama a tela de cadastro
+        form.ShowDialog();//impede que clicar em outra tela enquanto a de cadastro estiver aberta
     }
 }

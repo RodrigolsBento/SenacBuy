@@ -210,6 +210,7 @@
             lklCadastrar.TabIndex = 5;
             lklCadastrar.TabStop = true;
             lklCadastrar.Text = "Não tem uma conta? Cadastre-se";
+            lklCadastrar.LinkClicked += lklCadastrar_LinkClicked;
             // 
             // guna2HtmlLabel2
             // 
