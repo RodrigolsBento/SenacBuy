@@ -196,7 +196,6 @@
             Controls.Add(pbFoto);
             Name = "frmCadastroUsuario";
             Text = "frmCadastroUsuario";
-            Load += this.frmCadastroUsuario_Load;
             ((System.ComponentModel.ISupportInitialize)pbFoto).EndInit();
             ResumeLayout(false);
         }

@@ -19,7 +19,7 @@ namespace SenacBuy.UI
             InitializeComponent();
         }
 
-        private void btnCadastrar_Click(object sender, EventArgs e)
+        public async void btnCadastrar_Click(object sender, EventArgs e)
         {
 
             if (string.IsNullOrWhiteSpace(txtNome.Text) ||
@@ -28,6 +28,38 @@ namespace SenacBuy.UI
             {
                 MessageBox.Show("Preencha todos os campos para continuar.", "Atenção", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+
+            if (txtSenha.Text.Length <4)
+            {
+                MessageBox.Show("A senha deve ter pelo menos 4 caracteres.", "Atenção", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            btnCadastrar.Enabled = false;
+            btnCadastrar.Text = "Cadastrando...";
+
+            try
+            {
+                var usuario = await _usuarioApiService.CadastrarUsuarioAsync(
+                    nome: txtNome.Text.Trim(),
+                    email: txtEmail.Text.Trim(),
+                    senha: txtSenha.Text.Trim(),
+                    fotoPerfil: null);
+
+                if (usuario != null)
+                { 
+                    MessageBox.Show("Usuário cadastrado com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    this.DialogResult = DialogResult.OK;
+                    this.Close();
+                }
+            }
+            finally 
+            {
+
+                btnCadastrar.Enabled = true;
+                btnCadastrar.Text = "Cadastrar";
+            }
+
 
         }
     }
