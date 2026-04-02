@@ -68,7 +68,21 @@ public class UsuarioApiService //comunicação entre API e o forms, tmb funciona
 
 
 
+    //comunicação entre api e front //esse ususario dto deve vir da UI
+    public async Task<List<UsuarioDto>> ListarUsuarioAsync()
+    {
+        try
+        {
+            var lista = await _http.GetFromJsonAsync<List<UsuarioDto>>("api/usuario");//get de usuários ou seja traz todos 
+            return lista ?? new List<UsuarioDto>();//polessencia nula
+        }
+        catch (HttpRequestException ex)// parâmetro instanciado para capturar todos os erros contido na linguagem
+        {
 
+            MessageBox.Show($"Sem conexão com a API: {ex.Message}","Erro de conexão API", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return new List<UsuarioDto>();
+        }
+    }
 
 
 
