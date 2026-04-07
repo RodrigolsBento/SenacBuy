@@ -168,6 +168,7 @@
             btnNovoUsuario.Size = new Size(107, 35);
             btnNovoUsuario.TabIndex = 0;
             btnNovoUsuario.Text = "Novo Usuário";
+            btnNovoUsuario.Click += btnNovoUsuario_Click;
             // 
             // dgvUsuarios
             // 

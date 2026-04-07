@@ -107,5 +107,10 @@ namespace SenacBuy.UI
         {
             AtualizarGrid(_usuarios, txtBuscarUsuario.Text);
         }
+
+        private void btnNovoUsuario_Click(object sender, EventArgs e)
+        {
+            (this.FindForm() as FrmPrincipal)?.Navegar(new ucNovoUsuario());//linka um painel ao outro, para navegar entre os controles
+        }
     }
 }

@@ -85,8 +85,116 @@ public class UsuarioApiService //comunicação entre API e o forms, tmb funciona
     }
 
 
+    // ──────────────────────────────────────────────────────────────────────────────
+    // BUSCAR POR ID
+    // ──────────────────────────────────────────────────────────────────────────────
+
+    public async Task<UsuarioDto?> GetUsuarioByIdAsync(int id)
+    {
+        try
+        {
+            return await _http.GetFromJsonAsync<UsuarioDto>($"api/usuario/{id}");
+        }
+        catch (HttpRequestException ex)
+        {
+            MessageBox.Show($"Erro ao buscar usuário: {ex.Message}",
+                "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return null;
+        }
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────────
+    // ATUALIZAR USUÁRIO
+    // ──────────────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Atualiza nome e email de um usuário existente.
+    /// Retorna true em caso de sucesso.
+    /// </summary>
+    public async Task<bool> AtualizarUsuarioAsync(UsuarioDto dto)
+    {
+        try
+        {
+            var response = await _http.PutAsJsonAsync($"api/usuario/{dto.Id}", dto);
+
+            if (response.IsSuccessStatusCode)
+                return true;
+
+            var erro = await response.Content.ReadAsStringAsync();
+            MessageBox.Show(ExtrairMensagemErro(erro), "Erro ao Atualizar",
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return false;
+        }
+        catch (HttpRequestException ex)
+        {
+            MessageBox.Show($"Sem conexão com a API: {ex.Message}",
+                "Erro de Conexão", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return false;
+        }
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────────
+    // EXCLUIR USUÁRIO
+    // ──────────────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Exclui um usuário existente.
+    /// Retorna true em caso de sucesso.
+    /// </summary>
+    public async Task<bool> ExcluirUsuarioAsync(int id)
+    {
+        try
+        {
+            var response = await _http.DeleteAsync($"api/usuario/{id}");
+
+            if (response.IsSuccessStatusCode)
+                return true;
+
+            var erro = await response.Content.ReadAsStringAsync();
+            MessageBox.Show(ExtrairMensagemErro(erro), "Erro ao Excluir",
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return false;
+        }
+        catch (HttpRequestException ex)
+        {
+            MessageBox.Show($"Sem conexão com a API: {ex.Message}",
+                "Erro de Conexão", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return false;
+        }
+    }
 
 
+    // ──────────────────────────────────────────────────────────────────────────────
+    // UPLOAD DE FOTO
+    // ──────────────────────────────────────────────────────────────────────────────
+    public async Task<string?> UploadFotoAsync(string filePath)
+    {
+        try
+        {
+            using var form = new MultipartFormDataContent();
+            using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            using var streamContent = new StreamContent(fileStream);
+            var contentType = Path.GetExtension(filePath).ToLowerInvariant() == ".png" ? "image/png" : "image/jpeg";
+            streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(contentType);
+            form.Add(streamContent, "file", Path.GetFileName(filePath));
+
+            var response = await _http.PostAsync("api/upload/usuario", form);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = await response.Content.ReadFromJsonAsync<UploadResponseDto>(new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                return result?.Caminho;
+            }
+
+            var erro = await response.Content.ReadAsStringAsync();
+            MessageBox.Show(ExtrairMensagemErro(erro), "Erro no Upload", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show($"Erro ao enviar imagem: {ex.Message}", "Erro", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return null;
+        }
+    }
 
 
 

@@ -52,6 +52,7 @@ namespace SenacBuy.UI
         }
 
 
+        public void Navegar(UserControl control) => LoadUserControl(control);
 
 
     }
