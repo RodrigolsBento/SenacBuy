@@ -112,5 +112,19 @@ namespace SenacBuy.UI
         {
             (this.FindForm() as FrmPrincipal)?.Navegar(new ucNovoUsuario());//linka um painel ao outro, para navegar entre os controles
         }
+
+        private void btnEditarUsuario_Click(object sender, EventArgs e)
+        {
+            if (dgvUsuarios.CurrentRow == null)
+            {
+                MessageBox.Show("Selecione um usuário para editar.","Atenção", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var id = Convert.ToInt32(dgvUsuarios.CurrentRow.Cells["colId"].Value);
+            (this.FindForm() as FrmPrincipal)?.Navegar(new ucNovoUsuario(id)); //pesquisa por uma determinada informação 
+
+
+        }
     }
 }

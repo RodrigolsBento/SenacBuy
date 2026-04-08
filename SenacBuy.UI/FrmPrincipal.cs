@@ -32,11 +32,11 @@ namespace SenacBuy.UI
                 btnPedidos,
                 btnUsuarios
             };
-            foreach ( var btn in botoes)
-                {
-                    btn.FillColor = Color.Transparent;
-                    ForeColor = Color.FromArgb(160, 170, 204);
-                 }
+            foreach (var btn in botoes)
+            {
+                btn.FillColor = Color.Transparent;
+                ForeColor = Color.FromArgb(160, 170, 204);
+            }
             activeBtn.FillColor = Color.FromArgb(0, 123, 204);
             activeBtn.ForeColor = Color.White;
         }
@@ -45,7 +45,7 @@ namespace SenacBuy.UI
 
         private void LoadUserControl(UserControl uc)
         {
-           panelContainer.Controls.Clear();//limpa tela 
+            panelContainer.Controls.Clear();//limpa tela 
             uc.Dock = DockStyle.Fill; //encaixar 
             panelContainer.Controls.Add(uc);//vai ser o uc que foi clicado 
 
@@ -54,8 +54,11 @@ namespace SenacBuy.UI
 
         public void Navegar(UserControl control) => LoadUserControl(control);
 
-
+        private void guna2CircleButton1_Click(object sender, EventArgs e)
+        {
+            System.Windows.Forms.Application.Exit();//o close() matem a aplicação rodando em segundo plano, o exit fecha tudo
+        }
     }
 
- }
+}
 

@@ -149,6 +149,7 @@
             btnEditarUsuario.Size = new Size(107, 35);
             btnEditarUsuario.TabIndex = 0;
             btnEditarUsuario.Text = "Editar";
+            btnEditarUsuario.Click += btnEditarUsuario_Click;
             // 
             // btnNovoUsuario
             // 
