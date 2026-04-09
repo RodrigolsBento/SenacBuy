@@ -85,7 +85,7 @@
             // 
             txtEmail.BorderRadius = 10;
             txtEmail.CustomizableEdges = customizableEdges1;
-            txtEmail.DefaultText = "";
+            txtEmail.DefaultText = "admin@senac.br";
             txtEmail.DisabledState.BorderColor = Color.FromArgb(208, 208, 208);
             txtEmail.DisabledState.FillColor = Color.FromArgb(226, 226, 226);
             txtEmail.DisabledState.ForeColor = Color.FromArgb(138, 138, 138);
@@ -105,7 +105,7 @@
             // 
             txtSenha.BorderRadius = 10;
             txtSenha.CustomizableEdges = customizableEdges3;
-            txtSenha.DefaultText = "";
+            txtSenha.DefaultText = "1234";
             txtSenha.DisabledState.BorderColor = Color.FromArgb(208, 208, 208);
             txtSenha.DisabledState.FillColor = Color.FromArgb(226, 226, 226);
             txtSenha.DisabledState.ForeColor = Color.FromArgb(138, 138, 138);

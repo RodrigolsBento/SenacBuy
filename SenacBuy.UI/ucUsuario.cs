@@ -117,12 +117,36 @@ namespace SenacBuy.UI
         {
             if (dgvUsuarios.CurrentRow == null)
             {
-                MessageBox.Show("Selecione um usuário para editar.","Atenção", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Selecione um usuário para editar.", "Atenção", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
             var id = Convert.ToInt32(dgvUsuarios.CurrentRow.Cells["colId"].Value);
             (this.FindForm() as FrmPrincipal)?.Navegar(new ucNovoUsuario(id)); //pesquisa por uma determinada informação 
+
+
+        }
+
+        private async void btnExcluirUsuario_Click(object sender, EventArgs e)
+        {
+            if (dgvUsuarios.CurrentRow == null)
+            {
+                MessageBox.Show("Selecione um usuário para excluir.", "Atenção", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var id = Convert.ToInt32(dgvUsuarios.CurrentRow.Cells["colId"].Value);
+            string nome = dgvUsuarios.CurrentRow.Cells["colNome"].Value? .ToString() ?? "";
+            if (MessageBox.Show($"Excluir usuário: \"{nome}\"?\nEsta ação não poderá ser desfeita.", "confirmar Exclusão", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes) return;
+
+        bool ok = await _usuarioService.ExcluirUsuarioAsync(id);
+            if (ok)
+            {
+                MessageBox.Show("Usuário excluído com sucesso!", "Sucesso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                _usuarios.Clear();
+                await CarregarUsuariosAsync();
+                            
+            }
 
 
         }

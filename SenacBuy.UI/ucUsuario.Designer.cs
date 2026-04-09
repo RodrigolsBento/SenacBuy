@@ -131,6 +131,7 @@
             btnExcluirUsuario.Size = new Size(107, 35);
             btnExcluirUsuario.TabIndex = 0;
             btnExcluirUsuario.Text = "Excluir";
+            btnExcluirUsuario.Click += btnExcluirUsuario_Click;
             // 
             // btnEditarUsuario
             // 
