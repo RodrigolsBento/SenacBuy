@@ -176,19 +176,20 @@
             // 
             dataGridViewCellStyle1.BackColor = Color.White;
             dgvUsuarios.AlternatingRowsDefaultCellStyle = dataGridViewCellStyle1;
-            dgvUsuarios.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells;
-            dgvUsuarios.ClipboardCopyMode = DataGridViewClipboardCopyMode.Disable;
+            dgvUsuarios.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.AllCells;
+            dgvUsuarios.BorderStyle = BorderStyle.Fixed3D;
+            dgvUsuarios.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText;
             dgvUsuarios.ColumnHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleCenter;
             dataGridViewCellStyle2.BackColor = Color.FromArgb(100, 88, 255);
             dataGridViewCellStyle2.Font = new Font("Segoe UI", 9F);
             dataGridViewCellStyle2.ForeColor = Color.White;
+            dataGridViewCellStyle2.Padding = new Padding(10);
             dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
             dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
             dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
             dgvUsuarios.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle2;
-            dgvUsuarios.ColumnHeadersHeight = 4;
-            dgvUsuarios.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+            dgvUsuarios.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle3.BackColor = Color.White;
             dataGridViewCellStyle3.Font = new Font("Segoe UI", 9F);
@@ -199,6 +200,7 @@
             dgvUsuarios.DefaultCellStyle = dataGridViewCellStyle3;
             dgvUsuarios.GridColor = Color.FromArgb(231, 229, 255);
             dgvUsuarios.Location = new Point(5, 88);
+            dgvUsuarios.Margin = new Padding(10, 10, 5, 5);
             dgvUsuarios.Name = "dgvUsuarios";
             dataGridViewCellStyle4.BackColor = SystemColors.Control;
             dataGridViewCellStyle4.Font = new Font("Segoe UI", 9F);
@@ -221,7 +223,7 @@
             dgvUsuarios.ThemeStyle.HeaderStyle.BorderStyle = DataGridViewHeaderBorderStyle.Single;
             dgvUsuarios.ThemeStyle.HeaderStyle.Font = new Font("Segoe UI", 9F);
             dgvUsuarios.ThemeStyle.HeaderStyle.ForeColor = Color.White;
-            dgvUsuarios.ThemeStyle.HeaderStyle.HeaightSizeMode = DataGridViewColumnHeadersHeightSizeMode.EnableResizing;
+            dgvUsuarios.ThemeStyle.HeaderStyle.HeaightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             dgvUsuarios.ThemeStyle.HeaderStyle.Height = 4;
             dgvUsuarios.ThemeStyle.ReadOnly = false;
             dgvUsuarios.ThemeStyle.RowsStyle.BackColor = Color.White;
@@ -236,6 +238,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            BackgroundImageLayout = ImageLayout.None;
             Controls.Add(dgvUsuarios);
             Controls.Add(guna2Panel1);
             Name = "ucUsuario";
