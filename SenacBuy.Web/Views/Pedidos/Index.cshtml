@@ -1,0 +1,94 @@
+@model List<SenacBuy.Web.Models.PedidoViewModel>
+@{
+    ViewData["Title"] = "Pedidos";
+    var statusAtual = ViewBag.StatusAtual as string ?? "Todos";
+    string BadgeClass(string s) => s switch {
+        "Finalizado" => "badge-finalizado",
+        "Pendente"   => "badge-pendente",
+        "Cancelado"  => "badge-cancelado",
+        _            => ""
+    };
+    string FilterClass(string s) => s switch {
+        "Finalizado" => "green",
+        "Pendente"   => "yellow",
+        "Cancelado"  => "red",
+        _            => ""
+    };
+}
+
+<div class="page-header">
+    <div class="page-header-left">
+        <div class="filter-tabs">
+            @foreach (var s in new[] { "Todos", "Finalizado", "Pendente", "Cancelado" })
+            {
+                <a asp-action="Index" asp-route-status="@(s == "Todos" ? "" : s)"
+                   class="filter-tab @FilterClass(s) @(statusAtual == s ? "active" : "")">
+                    @(s == "Todos" ? "🔻 Todos" : s)
+                </a>
+            }
+        </div>
+    </div>
+    <a asp-action="Criar" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Novo Pedido
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <span class="card-title">Lista de Pedidos</span>
+        <span class="text-muted" style="font-size:12px;">@Model.Count pedido@(Model.Count != 1 ? "s" : "")</span>
+    </div>
+    <div class="table-wrapper">
+        @if (Model.Any())
+        {
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Cliente</th>
+                        <th>Data</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model)
+                    {
+                        <tr>
+                            <td class="text-muted">#@p.Id</td>
+                            <td class="fw-600">@p.NomeCliente</td>
+                            <td class="text-muted">@p.DataPedido.ToString("dd/MM/yyyy")</td>
+                            <td class="fw-700 text-primary">@p.Total.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</td>
+                            <td>
+                                <span class="badge @BadgeClass(p.Status)">@p.Status</span>
+                            </td>
+                            <td>
+                                <div class="actions-cell">
+                                    <a asp-action="Recibo" asp-route-id="@p.Id" class="btn btn-sm btn-success">🧾 Recibo</a>
+                                    <a asp-action="Editar" asp-route-id="@p.Id" class="btn btn-sm btn-secondary">✏️ Editar</a>
+                                    <form asp-action="Excluir" asp-route-id="@p.Id" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-danger"
+                                                data-confirm="Excluir o pedido #@p.Id?">🗑️</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="empty-icon">🛒</div>
+                <p>Nenhum pedido @(statusAtual != "Todos" ? $"com status \"{statusAtual}\"" : "cadastrado").</p>
+                <a asp-action="Criar" class="btn btn-primary" style="margin-top:12px;">Criar Primeiro Pedido</a>
+            </div>
+        }
+    </div>
+</div>

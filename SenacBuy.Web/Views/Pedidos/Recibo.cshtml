@@ -1,0 +1,79 @@
+@model SenacBuy.Web.Models.PedidoViewModel
+@{
+    ViewData["Title"] = $"Recibo #" + Model.Id;
+    string BadgeClass(string s) => s switch {
+        "Finalizado" => "badge-finalizado",
+        "Pendente"   => "badge-pendente",
+        "Cancelado"  => "badge-cancelado",
+        _            => ""
+    };
+}
+
+<div class="page-header">
+    <a asp-action="Index" class="btn btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Voltar
+    </a>
+    <button onclick="window.print()" class="btn btn-primary">🖨️ Imprimir</button>
+</div>
+
+<div class="card" style="max-width:620px;">
+    <div class="card-body">
+        <div class="recibo-header">
+            <div class="recibo-logo">SenacBuy</div>
+            <div class="recibo-subtitle">Comprovante de Pedido</div>
+            <div class="recibo-badge">
+                <span class="badge @BadgeClass(Model.Status)">@Model.Status</span>
+            </div>
+        </div>
+
+        <div class="recibo-info">
+            <div class="recibo-info-item">
+                <div class="label">Nº do Pedido</div>
+                <div class="value">#@Model.Id</div>
+            </div>
+            <div class="recibo-info-item">
+                <div class="label">Data</div>
+                <div class="value">@Model.DataPedido.ToString("dd/MM/yyyy HH:mm")</div>
+            </div>
+            <div class="recibo-info-item">
+                <div class="label">Cliente</div>
+                <div class="value">@Model.NomeCliente</div>
+            </div>
+            <div class="recibo-info-item">
+                <div class="label">Qtd. de Itens</div>
+                <div class="value">@Model.Itens.Count</div>
+            </div>
+        </div>
+
+        <!-- Itens -->
+        <table class="data-table" style="margin-bottom:0;">
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th style="text-align:center;">Qtd</th>
+                    <th style="text-align:right;">Unit.</th>
+                    <th style="text-align:right;">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Itens)
+                {
+                    <tr>
+                        <td>@item.NomeProduto</td>
+                        <td style="text-align:center;">@item.Quantidade</td>
+                        <td style="text-align:right;">@item.PrecoUnitario.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</td>
+                        <td style="text-align:right;" class="fw-700">@item.Subtotal.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <div class="recibo-total">
+            <span>Total do Pedido</span>
+            <span>@Model.Total.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</span>
+        </div>
+    </div>
+</div>

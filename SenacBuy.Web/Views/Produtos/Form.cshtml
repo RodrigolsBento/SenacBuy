@@ -1,0 +1,104 @@
+@model SenacBuy.Web.Models.ProdutoViewModel
+@{
+    var isEdit = Model.Id > 0;
+    ViewData["Title"] = isEdit ? "Editar Produto" : "Novo Produto";
+    var categorias = ViewBag.Categorias as List<SenacBuy.Web.Models.CategoriaViewModel> ?? new();
+    var apiBaseUrl = "http://localhost:5000";
+}
+
+<div class="page-header">
+    <a asp-action="Index" class="btn btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Voltar
+    </a>
+</div>
+
+<div class="card" style="max-width:680px;">
+    <div class="card-header">
+        <span class="card-title">@(isEdit ? "Editar" : "Novo") Produto</span>
+    </div>
+    <div class="card-body">
+        <form asp-action="@(isEdit ? "Editar" : "Criar")" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            @if (isEdit) { <input asp-for="Id" type="hidden" /> }
+            <input asp-for="FotoProduto" type="hidden" />
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    @foreach (var e in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    { <div>@e.ErrorMessage</div> }
+                </div>
+            }
+
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label class="form-label" asp-for="Nome">Nome do Produto</label>
+                    <input asp-for="Nome" class="form-control" placeholder="Ex: Notebook Dell i7" required />
+                </div>
+                <div class="form-group">
+                    <label class="form-label" asp-for="Preco">Preço (R$)</label>
+                    <input asp-for="Preco" class="form-control" type="number" step="0.01" min="0" placeholder="0,00" required />
+                </div>
+                <div class="form-group">
+                    <label class="form-label" asp-for="CategoriaId">Categoria</label>
+                    <select asp-for="CategoriaId" class="form-select">
+                        <option value="">— Sem categoria —</option>
+                        @foreach (var cat in categorias)
+                        {
+                            if (Model.CategoriaId == cat.Id)
+                            { <option value="@cat.Id" selected>@cat.Nome</option> }
+                            else
+                            { <option value="@cat.Id">@cat.Nome</option> }
+                        }
+                    </select>
+                </div>
+                <div class="form-group full">
+                    <label class="form-label">Foto do Produto</label>
+                    @if (!string.IsNullOrEmpty(Model.FotoProduto))
+                    {
+                        <div style="margin-bottom:8px;">
+                            <img src="@(apiBaseUrl + "/" + Model.FotoProduto)" style="height:80px;border-radius:8px;object-fit:cover;" alt="Foto atual" />
+                            <span class="text-muted" style="font-size:12px;margin-left:8px;">Foto atual — envie outra para substituir</span>
+                        </div>
+                    }
+                    <label class="form-file-label" for="foto">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21 15 16 10 5 21"/>
+                        </svg>
+                        Selecionar imagem...
+                    </label>
+                    <input type="file" id="foto" name="foto" accept="image/*" onchange="previewFoto(this)" />
+                    <img id="foto-preview" style="display:none;height:80px;border-radius:8px;object-fit:cover;margin-top:8px;" />
+                </div>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:24px;">
+                <button type="submit" class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                        <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+                    </svg>
+                    Salvar
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function previewFoto(input) {
+    const img = document.getElementById('foto-preview');
+    if (input.files && input.files[0]) {
+        img.src = URL.createObjectURL(input.files[0]);
+        img.style.display = 'block';
+        document.querySelector('.form-file-label').textContent = input.files[0].name;
+    }
+}
+</script>
+}

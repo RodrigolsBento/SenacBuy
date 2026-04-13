@@ -1,0 +1,160 @@
+@model SenacBuy.Web.Models.PedidoViewModel
+@{
+    var isEdit = Model.Id > 0;
+    ViewData["Title"] = isEdit ? "Editar Pedido" : "Novo Pedido";
+    var clientes = ViewBag.Clientes as List<SenacBuy.Web.Models.ClienteViewModel> ?? new();
+    var produtos  = ViewBag.Produtos  as List<SenacBuy.Web.Models.ProdutoViewModel>  ?? new();
+    var statuses  = new[] { "Pendente", "Finalizado", "Cancelado" };
+}
+
+<div class="page-header">
+    <a asp-action="Index" class="btn btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Voltar
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <span class="card-title">@(isEdit ? "Editar" : "Novo") Pedido</span>
+    </div>
+    <div class="card-body">
+        <form id="form-pedido" asp-action="@(isEdit ? "Editar" : "Criar")" method="post">
+            @Html.AntiForgeryToken()
+            @if (isEdit)
+            {
+                <input asp-for="Id" type="hidden" />
+                <input asp-for="Total" type="hidden" />
+            }
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    @foreach (var e in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    { <div>@e.ErrorMessage</div> }
+                </div>
+            }
+
+            <div class="form-grid" style="margin-bottom:24px;">
+                <div class="form-group">
+                    <label class="form-label" asp-for="ClienteId">Cliente</label>
+                    <select asp-for="ClienteId" class="form-select" required id="clienteId">
+                        <option value="">— Selecione o cliente —</option>
+                        @foreach (var c in clientes)
+                        {
+                            if (Model.ClienteId == c.Id)
+                            { <option value="@c.Id" selected>@c.Nome</option> }
+                            else
+                            { <option value="@c.Id">@c.Nome</option> }
+                        }
+                    </select>
+                </div>
+                @if (isEdit)
+                {
+                    <div class="form-group">
+                        <label class="form-label" asp-for="Status">Status</label>
+                        <select asp-for="Status" class="form-select" id="statusSel">
+                            @foreach (var s in statuses)
+                            {
+                                if (Model.Status == s)
+                                { <option value="@s" selected>@s</option> }
+                                else
+                                { <option value="@s">@s</option> }
+                            }
+                        </select>
+                    </div>
+                }
+            </div>
+
+            <!-- Itens do Pedido -->
+            <div style="margin-bottom:16px;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+                    <span class="card-title" style="font-size:14px;">Itens do Pedido</span>
+                    <button type="button" class="btn btn-secondary btn-sm" id="btnAddItem" onclick="addItem()">
+                        ➕ Adicionar Item
+                    </button>
+                </div>
+                <div id="itens-container">
+                    @if (Model.Itens.Any())
+                    {
+                        for (int i = 0; i < Model.Itens.Count; i++)
+                        {
+                            var item = Model.Itens[i];
+                            <div class="item-row" id="item-@i">
+                                <select name="Itens[@i].ProdutoId" class="form-select" required>
+                                    <option value="">— Produto —</option>
+                                    @foreach (var p in produtos)
+                                    {
+                                        if (item.ProdutoId == p.Id)
+                                        { <option value="@p.Id" selected>@p.Nome — @p.Preco.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</option> }
+                                        else
+                                        { <option value="@p.Id">@p.Nome — @p.Preco.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</option> }
+                                    }
+                                </select>
+                                <input name="Itens[@i].Quantidade" type="number" min="1" value="@item.Quantidade"
+                                       class="form-control" placeholder="Qtd" style="max-width:90px;" required />
+                                <button type="button" class="btn btn-danger btn-sm" onclick="removeItem(this)">🗑️</button>
+                            </div>
+                        }
+                    }
+                </div>
+                <p id="sem-itens" class="text-muted" style="font-size:13px;margin-top:6px;@(Model.Itens.Any() ? "display:none;" : "")">
+                    Nenhum item adicionado. Clique em "Adicionar Item" para começar.
+                </p>
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:12px;">
+                <button type="submit" class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                        <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+                    </svg>
+                    Salvar Pedido
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+var itemIndex = @Model.Itens.Count;
+var produtosData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(
+    (ViewBag.Produtos as List<SenacBuy.Web.Models.ProdutoViewModel> ?? new()).Select(p => new { p.Id, p.Nome, p.Preco })
+));
+
+function buildOptions() {
+    return produtosData.map(p =>
+        `<option value="${p.id}">${p.nome} — R$ ${p.preco.toFixed(2).replace('.',',')}</option>`
+    ).join('');
+}
+
+function addItem() {
+    const container = document.getElementById('itens-container');
+    const div = document.createElement('div');
+    div.className = 'item-row';
+    div.id = 'item-' + itemIndex;
+    div.innerHTML = `
+        <select name="Itens[${itemIndex}].ProdutoId" class="form-select" required>
+            <option value="">— Produto —</option>
+            ${buildOptions()}
+        </select>
+        <input name="Itens[${itemIndex}].Quantidade" type="number" min="1" value="1"
+               class="form-control" placeholder="Qtd" style="max-width:90px;" required />
+        <button type="button" class="btn btn-danger btn-sm" onclick="removeItem(this)">🗑️</button>
+    `;
+    container.appendChild(div);
+    itemIndex++;
+    document.getElementById('sem-itens').style.display = 'none';
+}
+
+function removeItem(btn) {
+    btn.closest('.item-row').remove();
+    if (!document.querySelector('.item-row'))
+        document.getElementById('sem-itens').style.display = '';
+}
+</script>
+}

@@ -1,17 +1,15 @@
-namespace SenacBuy.UI
+namespace SenacBuy.UI;
+
+/// <summary>
+/// Ponto de entrada da aplicação Windows Forms.
+/// A tela de login é exibida primeiro; o formulário principal só abre após autenticação.
+/// </summary>
+static class Program
 {
-    internal static class Program
+    [STAThread]
+    static void Main()
     {
-        /// <summary>
-        ///  The main entry point for the application.
-        /// </summary>
-        [STAThread]
-        static void Main()
-        {
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
-            ApplicationConfiguration.Initialize();
-            System.Windows.Forms.Application.Run(new frmLogin());
-        }
+        ApplicationConfiguration.Initialize();
+        Application.Run(new frmLogin());
     }
 }

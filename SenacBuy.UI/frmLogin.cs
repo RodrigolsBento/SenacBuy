@@ -1,66 +1,103 @@
-using SenacBuy.UI.Services;
+﻿using System;
+using System.Windows.Forms;
+using SenacBuy.UI.Services.Models;
 
-namespace SenacBuy.UI;
-
-public partial class frmLogin : Form
+namespace SenacBuy.UI
 {
-
-
-    private readonly UsuarioApiService _usuarioApiService = new();
-
-
-    public frmLogin()
+    /// <summary>
+    /// Tela de autenticação do SenacBuy.
+    /// O login é validado via API (POST api/usuario/login).
+    /// Inclui botão "Cadastrar-se" que abre frmCadastroUsuario.
+    /// </summary>
+    public partial class frmLogin : Form
     {
-        InitializeComponent();
-    }
+        private readonly UsuarioApiService _usuarioService = new();
 
-
-
-    private async void btnEntrar_Click_1(object sender, EventArgs e)
-    {
-        if (string.IsNullOrWhiteSpace(txtEmail.Text) || string.IsNullOrWhiteSpace(txtSenha.Text))
+        public frmLogin()
         {
-            MessageBox.Show("Preencha todos os campos para continuar.", "Atenção", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return;
+            InitializeComponent();
         }
 
-        btnEntrar.Enabled = false;
-        btnEntrar.Text = "Entrando...";
+        // ──────────────────────────────────────────────────────────────────────────────
+        // ENTRAR
+        // ──────────────────────────────────────────────────────────────────────────────
 
-        try
+        private async void btnEntrar_Click(object sender, EventArgs e)
         {
-            var resultado = await _usuarioApiService.LoginAsync(email: txtEmail.Text.Trim(), senha: txtSenha.Text);
-
-            if (resultado == null)
+            // Validação: campos obrigatórios
+            if (string.IsNullOrWhiteSpace(txtEmail.Text) ||
+                string.IsNullOrWhiteSpace(txtSenha.Text))
             {
-                //mensagem de erro já exibida no serviço 
+                MessageBox.Show("Preencha email e senha.", "Atenção",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if (resultado.Sucesso)
-            {
-                var principal = new FrmPrincipal();
-                principal.Show();
-                this.Hide();
-            }
-            else
-            {
-                MessageBox.Show($"Acesso negado. \n{resultado.Mensagem}", "Autenticação falhou", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            btnEntrar.Enabled = false;
+            btnEntrar.Text = "Entrando...";
 
+            try
+            {
+                // Chama a API para autenticar — POST api/usuario/login
+                var resultado = await _usuarioService.LoginAsync(
+                    email: txtEmail.Text.Trim(),
+                    senha: txtSenha.Text);
+
+                if (resultado == null)
+                {
+                    // Mensagem de erro já exibida pelo UsuarioApiService
+                    return;
+                }
+
+                if (resultado.Sucesso)
+                {
+                    // Login bem-sucedido — abre o formulário principal
+                    var principal = new frmPrincipal(resultado.Nome, resultado.FotoPerfil);
+                    principal.Show();
+                    this.Hide();
+                }
+                else
+                {
+                    MessageBox.Show(
+                        $"Acesso negado.\n{resultado.Mensagem}",
+                        "Autenticação Falhou",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                }
+            }
+            finally
+            {
+                btnEntrar.Enabled = true;
+                btnEntrar.Text = "Entrar";
+            }
         }
-        finally
+
+        // ──────────────────────────────────────────────────────────────────────────────
+        // CADASTRAR-SE
+        // ──────────────────────────────────────────────────────────────────────────────
+
+        private void btnCadastrarSe_Click(object sender, EventArgs e)
         {
-
-            btnEntrar.Enabled = true;
-            btnEntrar.Text = "Entrar";
+            // Abre o formulário de cadastro como diálogo modal
+            using var frm = new frmCadastroUsuario();
+            frm.ShowDialog(this);
+            // Após fechar o cadastro, o usuário retorna para esta tela de login
         }
 
-    }
+        // ──────────────────────────────────────────────────────────────────────────────
+        // FECHAR APLICAÇÃO
+        // ──────────────────────────────────────────────────────────────────────────────
 
-    private void lklCadastrar_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-    {
-        frmCadastroUsuario form = new();//chama a tela de cadastro
-        form.ShowDialog();//impede que clicar em outra tela enquanto a de cadastro estiver aberta
+        // Encerra toda a aplicação ao fechar o login
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            base.OnFormClosed(e);
+            Application.Exit();
+        }
+
+        private void btnFechar_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
+        }
     }
 }

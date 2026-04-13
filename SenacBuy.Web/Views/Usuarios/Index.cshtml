@@ -1,0 +1,77 @@
+@model List<SenacBuy.Web.Models.UsuarioViewModel>
+@{
+    ViewData["Title"] = "Usuários";
+    var apiBaseUrl = "http://localhost:5000";
+}
+
+<div class="page-header">
+    <div class="page-header-left">
+        <span class="text-muted" style="font-size:13px;">@Model.Count usuário@(Model.Count != 1 ? "s" : "") cadastrado@(Model.Count != 1 ? "s" : "")</span>
+    </div>
+    <a asp-action="Criar" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Novo Usuário
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <span class="card-title">Usuários do Sistema</span>
+    </div>
+    <div class="table-wrapper">
+        @if (Model.Any())
+        {
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Usuário</th>
+                        <th>Email</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var u in Model)
+                    {
+                        <tr>
+                            <td class="text-muted">#@u.Id</td>
+                            <td>
+                                <div class="user-cell">
+                                    <div class="user-avatar">
+                                        @if (!string.IsNullOrEmpty(u.FotoPerfil))
+                                        { <img src="@(apiBaseUrl + "/" + u.FotoPerfil)" alt="@u.Nome" /> }
+                                        else { @(u.Nome.Length > 0 ? u.Nome[0].ToString().ToUpper() : "?") }
+                                    </div>
+                                    <div class="user-info">
+                                        <div class="user-name">@u.Nome</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-muted">@u.Email</td>
+                            <td>
+                                <div class="actions-cell">
+                                    <a asp-action="Editar" asp-route-id="@u.Id" class="btn btn-sm btn-secondary">✏️ Editar</a>
+                                    <form asp-action="Excluir" asp-route-id="@u.Id" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-danger"
+                                                data-confirm="Excluir o usuário '@u.Nome'?">🗑️</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="empty-icon">👤</div>
+                <p>Nenhum usuário cadastrado.</p>
+                <a asp-action="Criar" class="btn btn-primary" style="margin-top:12px;">Criar Primeiro Usuário</a>
+            </div>
+        }
+    </div>
+</div>

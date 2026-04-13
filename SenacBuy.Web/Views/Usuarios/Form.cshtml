@@ -1,0 +1,96 @@
+@model SenacBuy.Web.Models.UsuarioViewModel
+@{
+    var isEdit = Model.Id > 0;
+    ViewData["Title"] = isEdit ? "Editar Usuário" : "Novo Usuário";
+    var apiBaseUrl = "http://localhost:5000";
+}
+
+<div class="page-header">
+    <a asp-action="Index" class="btn btn-secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/>
+        </svg>
+        Voltar
+    </a>
+</div>
+
+<div class="card" style="max-width:600px;">
+    <div class="card-header">
+        <span class="card-title">@(isEdit ? "Editar" : "Novo") Usuário</span>
+    </div>
+    <div class="card-body">
+        <form asp-action="@(isEdit ? "Editar" : "Criar")" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            @if (isEdit) { <input asp-for="Id" type="hidden" /> }
+            <input asp-for="FotoPerfil" type="hidden" />
+
+            @if (!ViewData.ModelState.IsValid)
+            {
+                <div class="alert alert-danger">
+                    @foreach (var e in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    { <div>@e.ErrorMessage</div> }
+                </div>
+            }
+
+            <!-- Avatar preview -->
+            <div style="display:flex;align-items:center;gap:16px;margin-bottom:20px;">
+                <div class="user-avatar" id="avatar-preview" style="width:64px;height:64px;border-radius:16px;font-size:22px;">
+                    @if (!string.IsNullOrEmpty(Model.FotoPerfil))
+                    { <img src="@(apiBaseUrl + "/" + Model.FotoPerfil)" style="width:100%;height:100%;object-fit:cover;" /> }
+                    else { @(Model.Nome.Length > 0 ? Model.Nome[0].ToString().ToUpper() : "👤") }
+                </div>
+                <div>
+                    <label class="form-file-label" for="foto" style="padding:8px 14px;font-size:13px;">
+                        📸 @(isEdit ? "Trocar foto" : "Adicionar foto")
+                    </label>
+                    <input type="file" id="foto" name="foto" accept="image/*" onchange="previewAvatar(this)" />
+                </div>
+            </div>
+
+            <div class="form-grid">
+                <div class="form-group full">
+                    <label class="form-label" asp-for="Nome">Nome completo</label>
+                    <input asp-for="Nome" class="form-control" placeholder="Ex: Ana Souza" required />
+                </div>
+                <div class="form-group full">
+                    <label class="form-label" asp-for="Email">Email</label>
+                    <input asp-for="Email" type="email" class="form-control" placeholder="usuario@email.com" required />
+                </div>
+                @if (!isEdit)
+                {
+                    <div class="form-group full">
+                        <label class="form-label" asp-for="Senha">Senha</label>
+                        <input asp-for="Senha" type="password" class="form-control" placeholder="Digite a senha" required minlength="6" />
+                        <span class="text-muted" style="font-size:12px;">Mínimo 6 caracteres.</span>
+                    </div>
+                }
+            </div>
+
+            <div style="display:flex;gap:10px;margin-top:24px;">
+                <button type="submit" class="btn btn-primary">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                        <polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/>
+                    </svg>
+                    Salvar
+                </button>
+                <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function previewAvatar(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const av = document.getElementById('avatar-preview');
+            av.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:16px;" />`;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
+}

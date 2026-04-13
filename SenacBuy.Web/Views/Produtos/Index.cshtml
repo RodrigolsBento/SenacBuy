@@ -1,0 +1,89 @@
+@model List<SenacBuy.Web.Models.ProdutoViewModel>
+@{
+    ViewData["Title"] = "Produtos";
+    var apiBaseUrl = "http://localhost:5000";
+}
+
+<div class="page-header">
+    <div class="page-header-left">
+        <form method="get" class="search-box">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
+            <input type="text" name="busca" value="@ViewBag.Busca" placeholder="Buscar produtos..." id="busca" />
+        </form>
+    </div>
+    <a asp-action="Criar" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        Novo Produto
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <span class="card-title">Lista de Produtos</span>
+        <span class="text-muted" style="font-size:12px;">@Model.Count produto@(Model.Count != 1 ? "s" : "")</span>
+    </div>
+    <div class="table-wrapper">
+        @if (Model.Any())
+        {
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Produto</th>
+                        <th>Categoria</th>
+                        <th>Preço</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model)
+                    {
+                        <tr>
+                            <td class="text-muted">#@p.Id</td>
+                            <td>
+                                <div class="product-cell">
+                                    <div class="product-thumb">
+                                        @if (!string.IsNullOrEmpty(p.FotoProduto))
+                                        {
+                                            <img src="@(apiBaseUrl + "/" + p.FotoProduto)" alt="@p.Nome" />
+                                        }
+                                        else { <span>📦</span> }
+                                    </div>
+                                    <span class="fw-600">@p.Nome</span>
+                                </div>
+                            </td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(p.CategoriaNome))
+                                { <span class="badge" style="background:var(--primary-light);color:var(--primary);">@p.CategoriaNome</span> }
+                                else { <span class="text-muted">—</span> }
+                            </td>
+                            <td class="fw-700 text-primary">@p.Preco.ToString("C", new System.Globalization.CultureInfo("pt-BR"))</td>
+                            <td>
+                                <div class="actions-cell">
+                                    <a asp-action="Editar" asp-route-id="@p.Id" class="btn btn-sm btn-secondary">✏️ Editar</a>
+                                    <form asp-action="Excluir" asp-route-id="@p.Id" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm btn-danger"
+                                                data-confirm="Excluir o produto '@p.Nome'?">🗑️</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <div class="empty-state">
+                <div class="empty-icon">📦</div>
+                <p>@(string.IsNullOrWhiteSpace(ViewBag.Busca as string) ? "Nenhum produto cadastrado." : "Nenhum produto encontrado para a busca.")</p>
+                <a asp-action="Criar" class="btn btn-primary" style="margin-top:12px;">Cadastrar Primeiro Produto</a>
+            </div>
+        }
+    </div>
+</div>
